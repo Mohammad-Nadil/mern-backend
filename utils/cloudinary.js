@@ -2,6 +2,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_NAME } from "../constants.js";
 import { ApiError } from "./ApiError.js";
 import fs from "fs";
+import streamifier from "streamifier";
 
 cloudinary.config({
   cloud_name: CLOUDINARY_NAME,
@@ -9,17 +10,22 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
-  try {
-    if (!localFilePath) return null;
-    const response = await cloudinary.uploader.upload(localFilePath, { resource_type: "auto" });
-    fs.unlinkSync(localFilePath);
-    return response;
-  } catch (error) {
-    fs.unlinkSync(localFilePath);
-    throw new ApiError(500, "Cloudinary upload failed");
-  }
+const uploadOnCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto" },
+      (error, result) => {
+        if (error) {
+          reject(new ApiError(500, "Cloudinary upload failed"));
+        } else {
+          resolve(result);
+        }
+      }
+    );
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
 };
+
 
 const deleteFromCloudinary = async (pic_id) => {
   if (!pic_id) return null; // skip if no id

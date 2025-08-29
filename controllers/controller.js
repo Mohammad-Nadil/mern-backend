@@ -19,7 +19,7 @@ const findNoteById = asyncHandler(async (req, res) => {
 
 const createNote = asyncHandler(async (req, res) => {
   const { title, content } = req.body;
-  const path = req.file?.path;
+  const path = req.file?.buffer;
 
   if (!title || !content) {
     throw new ApiError(400, "Title and content are required");
@@ -70,7 +70,7 @@ const deleteNote = asyncHandler(async (req, res) => {
 const updateNote = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { title, content } = req.body;
-  const path = req.file?.path;
+  const path = req.file?.buffer;
 
   if (!id) {
     throw new ApiError(400, "Note id is required");
