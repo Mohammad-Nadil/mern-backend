@@ -18,6 +18,10 @@ app.use("/api/notes", routes);
 
 app.use(errorHandler);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
