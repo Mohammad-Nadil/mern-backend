@@ -11,12 +11,8 @@ const noteSchema = new mongoose.Schema(
       required: true,
     },
     image: {
-      type: String,
-      default: null,
-    },
-    image_id: {
-      type: String,
-      default: null,
+      secure_url: String,
+      public_id: String,
     },
   },
   { timestamps: true }

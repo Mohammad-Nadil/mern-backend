@@ -32,8 +32,10 @@ const createNote = asyncHandler(async (req, res) => {
   const newNote = await Note.create({
     title,
     content,
-    image: secure_url || null,
-    image_id: public_id || null,
+    image: {
+      secure_url,
+      public_id,
+    },
   });
 
   res.status(201).json(new ApiResponse(201, "Note created successfully", newNote));
@@ -53,9 +55,9 @@ const deleteNote = asyncHandler(async (req, res) => {
   }
 
   // Cloudinary delete, crash-safe
-  if (note.image_id) {
+  if (note.image.public_id) {
     try {
-      const response = await deleteFromCloudinary(note.image_id);
+      const response = await deleteFromCloudinary(note.image.public_id);
       console.log("Cloudinary deletion response:", response);
     } catch (err) {
       console.error("Cloudinary deletion failed:", err);
@@ -72,25 +74,20 @@ const updateNote = asyncHandler(async (req, res) => {
   const { title, content } = req.body;
   const path = req.file?.buffer;
 
-  if (!id) {
-    throw new ApiError(400, "Note id is required");
-  }
-
-  if (!title || !content) {
-    throw new ApiError(400, "Title and content are required");
-  }
+  if (!id) throw new ApiError(400, "Note id is required");
+  if (!title || !content) throw new ApiError(400, "Title and content are required");
 
   const note = await Note.findById(id);
-  if (!note) {
-    throw new ApiError(404, "Note not found");
-  }
+  if (!note) throw new ApiError(404, "Note not found");
 
-  let secure_url = note.image;
-  let public_id = note.image_id;
+  // ✅ Initialize with existing image data
+  let secure_url = note.image?.secure_url || null;
+  let public_id = note.image?.public_id || null;
 
+  // ✅ If new image is uploaded
   if (path) {
-    if (note.image_id) {
-      await deleteFromCloudinary(note.image_id);
+    if (public_id) {
+      await deleteFromCloudinary(public_id);
     }
 
     const uploadResult = await uploadOnCloudinary(path);
@@ -103,17 +100,14 @@ const updateNote = asyncHandler(async (req, res) => {
     {
       title,
       content,
-      image: secure_url || null,
-      image_id: public_id || null,
+      image: { secure_url, public_id },
     },
     { new: true }
   );
 
-  if (!updatedNote) {
-    throw new ApiError(404, "Note not found");
-  }
-
-  res.status(200).json(new ApiResponse(200, "Note updated successfully", updatedNote));
+  res
+    .status(200)
+    .json(new ApiResponse(200, "Note updated successfully", updatedNote));
 });
 
 export { getNotes, createNote, updateNote, deleteNote, findNoteById };
