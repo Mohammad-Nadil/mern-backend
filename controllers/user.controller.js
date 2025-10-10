@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../model/user.model.js";
 import validator from "validator";
 import { cookieOptions, JWT_SECRET } from "../constants.js";
+import jwt from "jsonwebtoken";
 import { sendMail } from "../services/mail.service.js";
 import { verifyMailTemplate } from "../template/mail/verifyMail.js";
 
