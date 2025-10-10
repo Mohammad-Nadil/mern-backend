@@ -4,7 +4,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { cookieOptions, JWT_SECRET } from "../constants.js";
 
-{/* this is for auth + generate refresh token */}
+{
+  /* this is for auth + generate refresh token */
+}
 {
   /* 
 
@@ -59,22 +61,20 @@ import { cookieOptions, JWT_SECRET } from "../constants.js";
 */
 }
 
-export const jwt_verify = asyncHandler(async (req , res , next) => {
-  const accessToken = req.cookies?.noteAccess;
+export const jwt_verify = asyncHandler(async (req, res, next) => {
+  const accessToken =
+    req.cookies?.noteAccess || req.headers?.("authorization")?.replace("Bearer ", "");
   if (!accessToken) {
     throw new ApiError(401, "Access token not found");
   }
 
   try {
-
     const decoded = jwt.verify(accessToken, JWT_SECRET);
     const user = await User.findById(decoded._id);
     if (!user) throw new ApiError(401, "Access token failed");
     req.user = user;
     return next();
-    
   } catch (error) {
     throw new ApiError(401, "Unauthorized");
   }
-
-})
+});
