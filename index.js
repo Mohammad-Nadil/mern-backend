@@ -13,6 +13,7 @@ app.use(
   cors({
     origin: ["https://mern-frontend-jet.vercel.app", "http://localhost:5173"],
     credentials: true,
+    optionsSuccessStatus: 200,
   })
 );
 app.use(express.json());
