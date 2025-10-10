@@ -25,6 +25,10 @@ const createToken = async (id) => {
     return { accessToken, refreshToken };
   } catch (error) {
     console.log(error);
+     const user = await User.findById(id);
+    console.log(user);
+    
+    
     throw new ApiError(500, "Failed to create token");
   }
 };
