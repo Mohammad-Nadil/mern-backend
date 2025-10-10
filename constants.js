@@ -16,8 +16,9 @@ export const MAIL_PASS = process.env.MAIL_PASS;
 
 export const cookieOptions = {
   httpOnly: true,
-  secure: false ,
-  sameSite: "lax",
+  secure: true,
+  sameSite: "none",
+  path: "/",
 };
 
 // export const cookieOptions = {
