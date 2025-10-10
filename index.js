@@ -5,16 +5,23 @@ import { PORT } from "./constants.js";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { limiter } from "./middleware/rateLimiter.middleware.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
-app.use(cors({ origin: ["https://mern-frontend-jet.vercel.app", "http://localhost:5173"] }));
+app.use(
+  cors({
+    origin: ["https://mern-frontend-jet.vercel.app", "http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static("./public"));
+app.use(cookieParser());
 app.use(limiter);
 
-app.use("/api/notes", routes);
+app.use("/api", routes);
 
 app.use(errorHandler);
 
