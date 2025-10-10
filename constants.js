@@ -19,6 +19,7 @@ export const cookieOptions = {
   secure: true,
   sameSite: "none",
   path: "/",
+  domain: undefined,
 };
 
 // export const cookieOptions = {

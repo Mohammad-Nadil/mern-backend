@@ -5,8 +5,8 @@ import User from "../model/user.model.js";
 import validator from "validator";
 import { cookieOptions, JWT_SECRET } from "../constants.js";
 import jwt from "jsonwebtoken";
-import { sendMail } from "../services/mail.service.js";
-import { verifyMailTemplate } from "../template/mail/verifyMail.js";
+// import { sendMail } from "../services/mail.service.js";
+// import { verifyMailTemplate } from "../template/mail/verifyMail.js";
 
 const createToken = async (id) => {
   try {
@@ -26,10 +26,6 @@ const createToken = async (id) => {
     return { accessToken, refreshToken };
   } catch (error) {
     console.log(error);
-     const user = await User.findById(id);
-    console.log(user);
-    
-    
     throw new ApiError(500, "Failed to create token");
   }
 };
@@ -88,7 +84,6 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const isMatch = await user.comparePassword(password);
-
   if (!isMatch) {
     throw new ApiError(400, "Invalid credentials");
   }
@@ -97,11 +92,22 @@ const login = asyncHandler(async (req, res) => {
 
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
+  // debug logs
+  console.log("🍪 Setting cookies...");
+  console.log("Access Token:", accessToken ? "Generated ✅" : "Failed ❌");
+  console.log("Cookie Options:", cookieOptions);
+
   return res
     .status(200)
-    .cookie("noteAccess", accessToken, { ...cookieOptions, maxAge: 1 * 24 * 60 * 60 * 1000 })
-    .cookie("noteRefresh", refreshToken, { ...cookieOptions, maxAge: 10 * 24 * 60 * 60 * 1000 })
-    .json(new ApiResponse(200, "User logged in successfully"));
+    .cookie("noteAccess", accessToken, {
+      ...cookieOptions,
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+    })
+    .cookie("noteRefresh", refreshToken, {
+      ...cookieOptions,
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    })
+    .json(new ApiResponse(200, "User logged in successfully", { user: loggedInUser }));
 });
 
 const logout = asyncHandler(async (req, res) => {

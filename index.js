@@ -9,13 +9,26 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://mern-frontend-jet.vercel.app", // Your production frontend URL
+];
+
 app.use(
   cors({
-    origin: ["https://mern-frontend-jet.vercel.app", "http://localhost:5173"],
+    origin: function (origin, callback) {
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     optionsSuccessStatus: 200,
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./public"));
