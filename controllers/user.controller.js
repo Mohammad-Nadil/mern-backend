@@ -10,8 +10,14 @@ import { verifyMailTemplate } from "../template/mail/verifyMail.js";
 const createToken = async (id) => {
   try {
     const user = await User.findById(id);
+    if (!user) {
+      console.log("user not found", id);
+      throw new ApiError(404, "User not found");
+    }
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
+
+    console.log(user.generateAccessToken, user.generateRefreshToken);
 
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
@@ -51,12 +57,11 @@ const signup = asyncHandler(async (req, res) => {
 
   const user = await User.create({ email, password });
 
-
-  // Send verification email 
+  // Send verification email
 
   // const verifyLink = `http://localhost:5173/verify/${user._id}`;
   // await sendMail({
-  //   to: user.email, 
+  //   to: user.email,
   //   subject: "Verify your email",
   //   text: `Click the link to verify your email: ${verifyLink}`,
   //   html: verifyMailTemplate(user.email, verifyLink),
