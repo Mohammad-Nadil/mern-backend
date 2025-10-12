@@ -95,8 +95,8 @@ const login = asyncHandler(async (req, res) => {
   // debug logs
   console.log("🍪 Setting cookies...");
   console.log("Access Token:", accessToken ? "Generated ✅" : "Failed ❌");
-  console.log("Cookie Options:", cookieOptions);
-
+  console.log("Refresh Token:", refreshToken ? "Generated ✅" : "Failed ❌");
+  
   return res
     .status(200)
     .cookie("noteAccess", accessToken, {
@@ -107,7 +107,13 @@ const login = asyncHandler(async (req, res) => {
       ...cookieOptions,
       maxAge: 10 * 24 * 60 * 60 * 1000,
     })
-    .json(new ApiResponse(200, "User logged in successfully", { user: loggedInUser }));
+    .json(
+      new ApiResponse(200, "User logged in successfully", {
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
+      })
+    );
 });
 
 const logout = asyncHandler(async (req, res) => {

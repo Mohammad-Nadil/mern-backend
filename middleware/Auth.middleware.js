@@ -3,12 +3,12 @@ import User from "../model/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { cookieOptions, JWT_SECRET } from "../constants.js";
-
 {
-  /* this is for auth + generate refresh token */
-}
-{
-  /* 
+  {
+    /* this is for auth + generate refresh token */
+  }
+  {
+    /* 
 
  export const jwt_verify = asyncHandler(async (req, res, next) => {
   const accessToken = req.cookies?.noteAccess;
@@ -59,22 +59,32 @@ import { cookieOptions, JWT_SECRET } from "../constants.js";
 });
 
 */
-}
-
-export const jwt_verify = asyncHandler(async (req, res, next) => {
-  const accessToken =
-    req.cookies?.noteAccess || req.headers?.("authorization")?.replace("Bearer ", "");
-  if (!accessToken) {
-    throw new ApiError(401, "Access token not found");
   }
-
+}
+export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
-    const decoded = jwt.verify(accessToken, JWT_SECRET);
-    const user = await User.findById(decoded._id);
-    if (!user) throw new ApiError(401, "Access token failed");
+    const token = req.cookies?.noteAccess || req.header("Authorization")?.replace("Bearer ", "");
+
+    console.log("🔍 Token received:", !!token);
+    console.log("🍪 Cookies:", req.cookies);
+
+    if (!token) {
+      throw new ApiError(401, "Unauthorized request - No token found");
+    }
+
+    const decodedToken = jwt.verify(token, JWT_SECRET); // Use ACCESS_TOKEN_SECRET
+    console.log("✅ Token verified for user:", decodedToken._id);
+
+    const user = await User.findById(decodedToken._id).select("-password -refreshToken");
+
+    if (!user) {
+      throw new ApiError(401, "Invalid access token - User not found");
+    }
+
     req.user = user;
-    return next();
+    next();
   } catch (error) {
-    throw new ApiError(401, "Unauthorized");
+    console.error("❌ JWT verification failed:", error.message);
+    throw new ApiError(401, error?.message || "Invalid access token");
   }
 });

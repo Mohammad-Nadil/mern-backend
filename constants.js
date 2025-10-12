@@ -14,6 +14,10 @@ export const JWT_SECRET = process.env.JWT_SECRET;
 export const MAIL_USER = process.env.MAIL_USER;
 export const MAIL_PASS = process.env.MAIL_PASS;
 
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is not defined");
+}
+
 export const cookieOptions = {
   httpOnly: true,
   secure: true,

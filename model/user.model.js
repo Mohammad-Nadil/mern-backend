@@ -34,23 +34,39 @@ userSchema.methods.comparePassword = async function (password) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-  return jwt.sign(
-    {
-      _id: this._id,
-    },
-    JWT_SECRET,
-    { expiresIn: "1d" }
-  );
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  try {
+    return jwt.sign(
+      {
+        _id: this._id,
+      },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+  } catch (error) {
+    console.log("Access token error", error);
+  }
 };
 
 userSchema.methods.generateRefreshToken = function () {
-  return jwt.sign(
-    {
-      _id: this._id,
-    },
-    JWT_SECRET,
-    { expiresIn: "10d" }
-  );
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  try {
+    return jwt.sign(
+      {
+        _id: this._id,
+      },
+      JWT_SECRET,
+      { expiresIn: "10d" }
+    );
+  } catch (error) {
+    console.log("Refresh token error", error);
+  }
 };
 
 const User = mongoose.model("User", userSchema);
