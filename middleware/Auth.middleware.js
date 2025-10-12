@@ -3,18 +3,15 @@ import User from "../model/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { cookieOptions, JWT_SECRET } from "../constants.js";
-{
-  {
-    /* this is for auth + generate refresh token */
-  }
-  {
-    /* 
 
- export const jwt_verify = asyncHandler(async (req, res, next) => {
+/* this is for auth + generate refresh token */
+
+export const jwt_verify = asyncHandler(async (req, res, next) => {
   const accessToken = req.cookies?.noteAccess;
   const refreshToken = req.cookies?.noteRefresh;
 
   if (!accessToken && !refreshToken) {
+    res.redirect("/login");
     throw new ApiError(401, "Tokens not found");
   }
 
@@ -22,7 +19,10 @@ import { cookieOptions, JWT_SECRET } from "../constants.js";
     // 🔹 Try verifying access token first
     const decoded = jwt.verify(accessToken, JWT_SECRET);
     const user = await User.findById(decoded._id);
-    if (!user) throw new ApiError(401, "Access token failed");
+    if (!user) {
+      res.redirect("/login");
+      throw new ApiError(401, "Access token failed");
+    }
 
     req.user = user;
     return next();
@@ -31,7 +31,10 @@ import { cookieOptions, JWT_SECRET } from "../constants.js";
       // 🔸 Access token failed, try refresh token
       const decodedRefresh = jwt.verify(refreshToken, JWT_SECRET);
       const user = await User.findById(decodedRefresh._id);
-      if (!user) throw new ApiError(401, "Refresh token failed");
+      if (!user) {
+        res.redirect("/login");
+        throw new ApiError(401, "Refresh token failed");
+      }
 
       // Generate new tokens
       const newAccessToken = user.generateAccessToken();
@@ -53,15 +56,14 @@ import { cookieOptions, JWT_SECRET } from "../constants.js";
       req.user = user;
       return next();
     } catch {
+      res.redirect("/login");
       throw new ApiError(401, "Unauthorized");
     }
   }
 });
 
-*/
-  }
-}
-export const jwt_verify = asyncHandler(async (req, res, next) => {
+{
+  /* export const jwt_verify = asyncHandler(async (req, res, next) => {
   try {
     const token = req.cookies?.noteAccess || req.header("Authorization")?.replace("Bearer ", "");
 
@@ -87,4 +89,5 @@ export const jwt_verify = asyncHandler(async (req, res, next) => {
     console.error("❌ JWT verification failed:", error.message);
     throw new ApiError(401, error?.message || "Invalid access token");
   }
-});
+}); */
+}
