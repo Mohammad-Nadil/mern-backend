@@ -61,7 +61,7 @@ import { cookieOptions, JWT_SECRET } from "../constants.js";
 */
   }
 }
-export const verifyJWT = asyncHandler(async (req, res, next) => {
+export const jwt_verify = asyncHandler(async (req, res, next) => {
   try {
     const token = req.cookies?.noteAccess || req.header("Authorization")?.replace("Bearer ", "");
 
