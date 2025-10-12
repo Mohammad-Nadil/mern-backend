@@ -102,12 +102,10 @@ const login = asyncHandler(async (req, res) => {
   // Set cookies with detailed logging
   res.cookie("noteAccess", accessToken, {
     ...cookieOptions,
-    maxAge: 1 * 24 * 60 * 60 * 1000,
   });
 
   res.cookie("noteRefresh", refreshToken, {
     ...cookieOptions,
-    maxAge: 10 * 24 * 60 * 60 * 1000,
   });
 
   console.log("✅ Cookies set successfully");
