@@ -71,6 +71,7 @@ const signup = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, "User signed up successfully", user));
 });
 
+// user.controller.js - login function
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -89,31 +90,38 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const { accessToken, refreshToken } = await createToken(user._id);
-
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
-  // debug logs
-  console.log("🍪 Setting cookies...");
-  console.log("Access Token:", accessToken ? "Generated ✅" : "Failed ❌");
-  console.log("Refresh Token:", refreshToken ? "Generated ✅" : "Failed ❌");
-  
-  return res
-    .status(200)
-    .cookie("noteAccess", accessToken, {
-      ...cookieOptions,
-      maxAge: 1 * 24 * 60 * 60 * 1000,
-    })
-    .cookie("noteRefresh", refreshToken, {
-      ...cookieOptions,
-      maxAge: 10 * 24 * 60 * 60 * 1000,
-    })
-    .json(
-      new ApiResponse(200, "User logged in successfully", {
-        user: loggedInUser,
+  // Enhanced logging
+  console.log("🔐 Login attempt:");
+  console.log("  - User:", email);
+  console.log("  - Origin:", req.headers.origin);
+  console.log("  - Tokens generated:", { access: !!accessToken, refresh: !!refreshToken });
+  console.log("  - Cookie options:", cookieOptions);
+
+  // Set cookies with detailed logging
+  res.cookie("noteAccess", accessToken, {
+    ...cookieOptions,
+    maxAge: 1 * 24 * 60 * 60 * 1000,
+  });
+
+  res.cookie("noteRefresh", refreshToken, {
+    ...cookieOptions,
+    maxAge: 10 * 24 * 60 * 60 * 1000,
+  });
+
+  console.log("✅ Cookies set successfully");
+
+  return res.status(200).json(
+    new ApiResponse(200, "User logged in successfully", {
+      user: loggedInUser,
+      // Send tokens in response as backup
+      tokens: {
         accessToken,
         refreshToken,
-      })
-    );
+      },
+    })
+  );
 });
 
 const logout = asyncHandler(async (req, res) => {
