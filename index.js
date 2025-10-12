@@ -16,8 +16,6 @@ const allowedOrigins = [
   "https://mern-frontend-jet.vercel.app", // Your production frontend
 ].filter(Boolean);
 
-console.log("🌐 Allowed CORS origins:", allowedOrigins);
-
 app.use(
   cors({
     origin: function (origin, callback) {

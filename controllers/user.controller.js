@@ -133,8 +133,8 @@ const logout = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .clearCookie("noteAccess")
-    .clearCookie("noteRefresh")
+    .clearCookie("noteAccess" , cookieOptions)
+    .clearCookie("noteRefresh" , cookieOptions)
     .json(new ApiResponse(200, "User logged out successfully"));
 });
 
