@@ -62,6 +62,9 @@ export const jwt_verify = asyncHandler(async (req, res, next) => {
   }
 });
 
+
+/* this is for auth only */
+
 {
   /* export const jwt_verify = asyncHandler(async (req, res, next) => {
   try {
